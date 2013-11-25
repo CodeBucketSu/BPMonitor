@@ -1,0 +1,2 @@
+BPMonitor is a PC program responsible for communicating with node via bluetooth. 
+Program provide a man-machine interface which can receive, unpack, process and store the signals.

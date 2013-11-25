@@ -17,6 +17,7 @@ from PlottingHelper import *
 from DataHolder import *
 
 from SerialSettingsDialog import *
+from FileHelper import *
 
 __version__ = "1.0"
 
@@ -41,7 +42,6 @@ class MainWindow(QMainWindow):
         #=======================================
         self.interval_in_seconds = 5
         self.q_time_elapsed = QTime(0, 0, 0, 0)
-
         # Data receiver
         self.data_receiver = DataReceiver()
         self.serial_settings = {"port":'Com8', "baud":115200, \
@@ -52,6 +52,11 @@ class MainWindow(QMainWindow):
         self.data_holder = DataHolder()
         self.connect(self.data_receiver.qtobj, SIGNAL("NewData"),\
                      self.data_holder.on_receive_data)
+
+        # File helper
+        self.file_helper = FileHelper()
+        self.connect(self.data_receiver.qtobj, SIGNAL("NewData"),\
+                      self.file_helper.writeToFile)
 
         # Plot_helpers
         self.bp_ecg_plot_helper = PlottingHelper(self, \
@@ -241,6 +246,7 @@ class MainWindow(QMainWindow):
             if self.data_receiver.open(self.serial_settings):
                 if self.data_receiver.serial.isOpen():
                     print 'Open serial successfully'
+                    self.file_helper.openFileToWrite()
                     sleep(0.1)
                     self.data_receiver.start()
                     self.start_action.setChecked(True)
@@ -268,6 +274,11 @@ class MainWindow(QMainWindow):
         print ' scale_spinbox triggered. Plot %d seconds.' \
                 % self.interval_in_seconds
 
+    def closeEvent(self, event):
+        if self.file_helper.isOpen():
+            self.file_helper.closeFile()
+            self.statusBar().showMessage('Close.')
+        print "closeEvent."    
 
 
 
