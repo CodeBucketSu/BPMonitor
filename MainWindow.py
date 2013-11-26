@@ -44,9 +44,7 @@ class MainWindow(QMainWindow):
         self.q_time_elapsed = QTime(0, 0, 0, 0)
         # Data receiver
         self.data_receiver = DataReceiver()
-        self.serial_settings = {"port":'Com8', "baud":115200, \
-                                "bytesize":8, "parity":"N", \
-                                "stopbits":1, "timeout":1}
+        self.serial_settings = {}
         
         # Data holder
         self.data_holder = DataHolder()
@@ -248,8 +246,6 @@ class MainWindow(QMainWindow):
                     print 'Open serial successfully'
                     self.file_helper.openFileToWrite()
                     sleep(0.1)
-                    self.data_receiver.start()
-                    self.start_action.setChecked(True)
                 else:
                     print "Serial port is not open."
             else:
@@ -259,14 +255,37 @@ class MainWindow(QMainWindow):
     def start_plot(self):
     	''' Start or restart plotting the signals.'''
     	print 'MainWindow.start_plot() was triggered.'
+        if self.serial_settings == {}:
+            #Show a dialog here!!!
+
+            self.statusBar().showMessage('Setting the serial first.')
+            self.start_action.setChecked(False)
+        else:
+            self.data_receiver.start()
+            self.start_action.setChecked(True)
+            self.statusBar().showMessage('Start plotting.')
+
 
     def pause_plot(self):
     	''' Pause plotting the signals.'''
     	print 'MainWindow.pause_plot() was triggered.'
+        if not self.start_action.isChecked():
+            self.pause_action.setChecked(False)
+            return
+
+        self.statusBar().showMessage('Pause plotting.')
 
     def stop_plot(self):
     	''' Stop plotting the signals.'''
     	print 'MainWindow.start_plot() was triggered.'
+        if not self.start_action.isChecked() and \
+            not self.pause_action.isChecked():
+            self.stop_action.setChecked(False)
+            return
+
+        self.statusBar().showMessage('Stop plotting.')
+        self.data_receiver.close()
+
 
     def scale_changed(self):
         ''' Update the scale factor.'''

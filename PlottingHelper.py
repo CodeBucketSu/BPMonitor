@@ -29,7 +29,7 @@ class PlottingHelper(object):
 		for list_name, sig_name_list in self.signal_names.items():
 			# One CurvePlot object for every sig_name_list
 			curve_plot = CurvePlot()
-			curve_plot.axisScaleDraw(CurvePlot.Y_LEFT).setMinimumExtent(60)
+			curve_plot.axisScaleDraw(CurvePlot.Y_LEFT).setMinimumExtent(10)
 			self.curve_plots[list_name] = curve_plot
 			curve_plot.plot_id = id(curve_plot)
 			for i, sig_name in enumerate(sig_name_list):
