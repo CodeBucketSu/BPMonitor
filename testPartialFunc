@@ -1,8 +1,0 @@
-import sys
-if sys.version_info[:2] < (2, 5):
-    def partial(func, arg):
-        def callme():
-            return func(arg)
-        return callme
-else:
-    from functools import partial
