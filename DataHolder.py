@@ -70,12 +70,12 @@ class DataHolder(object):
             '''In this while loop, we only process the start part of 
             self.curr_raw_data.'''
 
-            print 'len(curr_data) = ', len(self.curr_raw_data)
+            #print 'len(curr_data) = ', len(self.curr_raw_data)
             if len(self.curr_raw_data) < 4:
-                print "*** len < 4: break. ***"
+                #print "*** len < 4: break. ***"
                 break
 
-            # Judge whether there is packages contained in 
+            # Judge whether there is package contained in 
             # self.curr_raw_data.
             try:
                 idx_start_package = self.curr_raw_data.index\
@@ -85,24 +85,24 @@ class DataHolder(object):
                 # print it! However, maybe there is an incomplete start
                 # flag in the end of self.curr_raw_data, so let's keep 
                 # the last 3 bytes.
-                print '### no package start flag! ###'
+                #print '### no package start flag! ###'
                 print self.curr_raw_data
                 self.curr_raw_data = self.curr_raw_data[-3:-1]
                 break
             
-            print '    idx = ', idx_start_package
+            #print '    idx = ', idx_start_package
             # We're here because there do exists a start flag!
             if idx_start_package > 0:
                 if idx_start_package > 3:
-                    print '    **** idx > 3 ****'
+                    #print '    **** idx > 3 ****'
                 	# There is debug messages before the first package.
-                    print self.curr_raw_data[3:idx_start_package]
+                    #print self.curr_raw_data[3:idx_start_package]
                     self.curr_raw_data = self.curr_raw_data\
                     						[idx_start_package:]
                     continue
 
                 else:
-                    print '    *** 0 < idx <= 3 ***'
+                    #print '    *** 0 < idx <= 3 ***'
                     # There is no debug messages at the beginning.
                     self.curr_raw_data = self.curr_raw_data\
                     						[idx_start_package:]
@@ -113,15 +113,15 @@ class DataHolder(object):
             # Let's see whether there is enough space for a complete 
             # package. 
             if len(self.curr_raw_data) < 392:
-                print '    *** len < 392: break ***'
+                #print '    *** len < 392: break ***'
                 break
 
             else:
-                print '    *** len > 392 ***'
+                #print '    *** len > 392 ***'
                 # There may be a complete package, but we can't be sure.
                 if self.curr_raw_data[388:392] == '\xf0\xf0\xf0\xf0':
                     # Congratulations! Here is the package!
-                    print '    *** find a package!! ***'
+                    #print '    *** find a package!! ***'
                     self.all_packages.append(self.curr_raw_data[:392])
                     self.curr_raw_data = self.curr_raw_data[392:]
                     continue
@@ -133,21 +133,21 @@ class DataHolder(object):
 
     def __unpack_a_package_into_signals(self, raw_data):
         ''' Unpack a complete package into self.signals.'''
-        print "DataHolder: unpack a package"
+        #print "DataHolder: unpack a package"
         data = list(unpack(fmt, raw_data))
-        print '    package: ', data[0:12]
+        #print '    package: ', data[0:12]
         for sig in signalNames:
             self.signals[sig].extend(data[offsetDict[sig] : \
                             offsetDict[sig]+lengthDict[sig]])
         self.time_seq.extend(np.linspace(0.001, 0.05, 50) + self.curr_time)
         self.curr_time += 0.05
-        print '    curr_time = ', self.curr_time
-        print '    len(BP1) = ', len(self.signals['BP1'])
-        print '    len(acc1_x) = ', len(self.signals['acc1_x'])
-        print '    len(time)  = ', len(self.time_seq)
+        #print '    curr_time = ', self.curr_time
+        #print '    len(BP1) = ', len(self.signals['BP1'])
+        #print '    len(acc1_x) = ', len(self.signals['acc1_x'])
+        #print '    len(time)  = ', len(self.time_seq)
 
     def on_receive_data(self, new_data):
-        ''' Do the whole job every time a piece of new data received.
+        ''' Do the whole job every time a piece of new data arrives.
         Extract signals from input data and print debug messages if 
         there exist any.'''
         self.new_raw_data = new_data
@@ -158,6 +158,6 @@ class DataHolder(object):
             self.__unpack_a_package_into_signals(package)
             self.qtobj.emit(SIGNAL("UpdateCurve"))
         self.num_packages = len(self.all_packages)
-        print '    num_packages = ', self.num_packages
+        #print '    num_packages = ', self.num_packages
 
 

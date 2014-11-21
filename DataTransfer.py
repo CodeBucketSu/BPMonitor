@@ -5,11 +5,11 @@ from PyQt4.QtCore import QObject, SIGNAL
 from serial import Serial
 from struct import *
 
-class DataReceiver(threading.Thread):
+class DataTransfer(threading.Thread):
     def __init__(self):
         threading.Thread.__init__(self)
         self.qtobj = QObject()
-        self.__terminate = False
+        self.__terminate = True
         
     def open(self, settings):
         try:
@@ -26,7 +26,7 @@ class DataReceiver(threading.Thread):
     def terminate(self):
         self.__terminate = True
         
-    def send(self, data, _type):
+    def __send(self, data, _type):
         self.serial.write(data)
     
     def __recv(self):
@@ -41,13 +41,27 @@ class DataReceiver(threading.Thread):
 
             n = self.serial.inWaiting()
             if n>0:
-                data = self.serial.read(n)
+                data = self.serial.read(2*(n/2))
                 break
 
             else:
                 sleep(0.02)
 
         return data
+
+    def startTransfer(self):
+    	'''
+    	Send a char 's' to the board to start the data transfer.
+    	'''
+        self.__terminate = False
+    	self.serial.write('s')
+
+    def pauseTransfer(self):
+    	'''
+    	Send a char 'p' to the board to pause the data transfer.
+    	'''
+        self.__terminate = True
+    	self.serial.write('p')
 
     
     def close(self):
