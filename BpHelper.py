@@ -25,3 +25,9 @@ class BpHelper():
             the array of parameters.
         '''
         return 
+
+    def computeBP(self, ecg, ppg, parameters, formula):
+        '''
+        Compute the blood pressure from ecg and ppg signals.
+        '''
+        return
